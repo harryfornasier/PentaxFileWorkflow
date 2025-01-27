@@ -1,29 +1,22 @@
 from pathlib import Path
 import shutil
-from osxmetadata import OSXMetaData
 import os
 
 #These are the extensions for the Pentax camera.
 #Change them if you want to use this script with a different raw file.
 target_extensions = [".pef", ".xmp"]
 
-def check_comments(directory):
-    folders_without_comments = []
+def check_saved(directory):
+    folders_without_saved = []
 
     for root, dirs, files in os.walk(directory):
         for name in dirs:
-            path = os.path.join(root, name)
-            md = OSXMetaData(path)
-            if not md.findercomment:
-                folders_without_comments.append(name)
+            if "_saved" not in name:
+                folders_without_saved.append(name)
 
-    if folders_without_comments:
-        return folders_without_comments
-    else:
-        return False
+    return folders_without_saved if folders_without_saved else False
 
-
-new_folders = check_comments("./DCIM")
+new_folders = check_saved("./DCIM")
 
 if new_folders:
     for folder in new_folders:
@@ -48,7 +41,6 @@ if new_folders:
                     shutil.copy2(file, dest)
                     print(f"Copied: {file.name} ➔ {folder_name}/")
 
-        md = OSXMetaData(f"./DCIM/{folder}")
-        md.kMDItemFinderComment = "Saved"
+        shutil.move(f"./DCIM/{folder}", f"./DCIM/{folder}_saved")
 else:
     print("There seem to be no new folders")
