@@ -36,17 +36,19 @@ if new_folders:
 
         print(f"Folder '{folder_name}' has been created.")
 
-
         for file in Path(f"./DCIM/{folder}").iterdir():
             if file.is_file():
                 ext = file.suffix.lower()
                 if ext in target_extensions:
-                    dest = folder_path / file.name
+                    dest = folder_path
                     shutil.copy2(file, dest)
                     print(f"Copied: {file.name} ➔ {folder_name}/")
                 else:
-                    dest = root_path / file.name
+                    dest = root_path
                     shutil.copy2(file, dest)
                     print(f"Copied: {file.name} ➔ {folder_name}/")
+
+        md = OSXMetaData(f"./DCIM/{folder}")
+        md.kMDItemFinderComment = "Saved"
 else:
     print("There seem to be no new folders")
